@@ -5,7 +5,7 @@ import { TrendingNow } from "@/components/TrendingNow";
 import { categories, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export default async function Home() {
   const news = await getNews();

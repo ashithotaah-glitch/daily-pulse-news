@@ -32,6 +32,11 @@ type FeedSource = {
   limit?: number;
 };
 
+type NewsCache = {
+  items: NewsItem[];
+  expiresAt: number;
+};
+
 export const categories: { id: NewsCategory; label: string; query: string }[] = [
   { id: "top", label: "Top Stories", query: "top stories" },
   { id: "technology", label: "Tech", query: "technology AI startups cybersecurity" },
@@ -144,6 +149,12 @@ const feedSources: FeedSource[] = [
     limit: 8
   }
 ];
+
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const FEED_TIMEOUT_MS = 3500;
+const MIN_LIVE_ITEMS = 8;
+
+let newsCache: NewsCache | null = null;
 
 const fallbackNews: NewsItem[] = categories.flatMap((category, index) => {
   const title = `${category.label} daily briefing: key moves editors are tracking`;
@@ -262,12 +273,16 @@ function itemImage(block: string, source: FeedSource) {
 }
 
 async function fetchSourceFeed(source: FeedSource): Promise<NewsItem[]> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FEED_TIMEOUT_MS);
+
   const response = await fetch(source.url, {
     headers: {
       "User-Agent": "FlashFeedBot/1.0 (+https://flashfeed.blog)"
     },
-    next: { revalidate: 900 }
-  });
+    next: { revalidate: 600 },
+    signal: controller.signal
+  }).finally(() => clearTimeout(timeout));
 
   if (!response.ok) {
     throw new Error(`Feed failed for ${source.name}`);
@@ -323,16 +338,26 @@ function dedupeNews(items: NewsItem[]) {
 }
 
 export async function getNews() {
+  if (newsCache && Date.now() < newsCache.expiresAt) {
+    return newsCache.items;
+  }
+
   try {
     const settled = await Promise.allSettled(feedSources.map(fetchSourceFeed));
     const liveItems = settled.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
     const normalized = dedupeNews(liveItems).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 
-    if (normalized.length < 8) return fallbackNews;
+    if (normalized.length < MIN_LIVE_ITEMS) {
+      return newsCache?.items ?? fallbackNews;
+    }
 
+    newsCache = {
+      items: normalized,
+      expiresAt: Date.now() + CACHE_TTL_MS
+    };
     return normalized;
   } catch {
-    return fallbackNews;
+    return newsCache?.items ?? fallbackNews;
   }
 }
 
