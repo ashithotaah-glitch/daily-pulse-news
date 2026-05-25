@@ -1,7 +1,9 @@
 import type { AIEnrichment, ImpactLevel, RawArticle, Sentiment, StandardArticle } from "./types";
 import { canonicalUrl, keywordSet, stripTags } from "./utils";
 
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const SKIP_AI_DURING_BUILD = process.env.NEXT_PHASE === "phase-production-build";
 
 const emptyEntities: StandardArticle["entities"] = {
   people: [],
@@ -83,10 +85,90 @@ function safeJsonParse(value: string): Partial<AIEnrichment> {
   }
 }
 
-export async function generateAIEnrichment(article: RawArticle): Promise<AIEnrichment> {
-  const fallback = fallbackAIEnrichment(article);
+function normalizeAIEnrichment(parsed: Partial<AIEnrichment>, fallback: AIEnrichment): AIEnrichment {
+  return {
+    aiSummary: parsed.aiSummary || fallback.aiSummary,
+    whyItMatters: parsed.whyItMatters || fallback.whyItMatters,
+    keyPoints: Array.isArray(parsed.keyPoints) && parsed.keyPoints.length ? parsed.keyPoints.slice(0, 3) : fallback.keyPoints,
+    tags: Array.isArray(parsed.tags) && parsed.tags.length ? parsed.tags.slice(0, 8) : fallback.tags,
+    entities: { ...emptyEntities, ...(parsed.entities || {}) },
+    sentiment: ["negative", "neutral", "positive"].includes(parsed.sentiment || "") ? (parsed.sentiment as Sentiment) : fallback.sentiment,
+    impactLevel: ["low", "medium", "high"].includes(parsed.impactLevel || "") ? (parsed.impactLevel as ImpactLevel) : fallback.impactLevel
+  };
+}
+
+function enrichmentPrompt(article: RawArticle) {
+  return JSON.stringify({
+    instruction:
+      "You enrich news metadata for a copyright-safe aggregator. Use only the provided headline, description, metadata, and URL. Do not copy full article body. Return compact JSON only.",
+    task: "Create a short summary, why it matters, 3 key points, tags, entities, sentiment, and impact level.",
+    schema: {
+      aiSummary: "string under 240 chars",
+      whyItMatters: "string under 220 chars",
+      keyPoints: ["3 concise strings"],
+      tags: ["category tags"],
+      entities: {
+        people: [],
+        companies: [],
+        countries: [],
+        products: [],
+        organizations: [],
+        events: [],
+        industries: []
+      },
+      sentiment: "negative|neutral|positive",
+      impactLevel: "low|medium|high"
+    },
+    article: {
+      title: article.title,
+      description: article.description,
+      source: article.sourceName,
+      category: article.category,
+      url: canonicalUrl(article.originalUrl)
+    }
+  });
+}
+
+async function generateGeminiEnrichment(article: RawArticle, fallback: AIEnrichment): Promise<AIEnrichment | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json"
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: enrichmentPrompt(article) }]
+            }
+          ]
+        })
+      }
+    );
+
+    if (!response.ok) throw new Error(`Gemini failed: ${response.status}`);
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.map((part: { text?: string }) => part.text ?? "").join("") ?? "{}";
+    return normalizeAIEnrichment(safeJsonParse(text), fallback);
+  } catch (error) {
+    console.error("[ai] Gemini enrichment failed", error);
+    return null;
+  }
+}
+
+async function generateOpenAIEnrichment(article: RawArticle, fallback: AIEnrichment): Promise<AIEnrichment | null> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) return fallback;
+  if (!apiKey) return null;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -107,33 +189,7 @@ export async function generateAIEnrichment(article: RawArticle): Promise<AIEnric
           },
           {
             role: "user",
-            content: JSON.stringify({
-              task: "Create a short summary, why it matters, 3 key points, tags, entities, sentiment, and impact level.",
-              schema: {
-                aiSummary: "string under 240 chars",
-                whyItMatters: "string under 220 chars",
-                keyPoints: ["3 concise strings"],
-                tags: ["category tags"],
-                entities: {
-                  people: [],
-                  companies: [],
-                  countries: [],
-                  products: [],
-                  organizations: [],
-                  events: [],
-                  industries: []
-                },
-                sentiment: "negative|neutral|positive",
-                impactLevel: "low|medium|high"
-              },
-              article: {
-                title: article.title,
-                description: article.description,
-                source: article.sourceName,
-                category: article.category,
-                url: canonicalUrl(article.originalUrl)
-              }
-            })
+            content: enrichmentPrompt(article)
           }
         ]
       })
@@ -143,18 +199,22 @@ export async function generateAIEnrichment(article: RawArticle): Promise<AIEnric
     const data = await response.json();
     const parsed = safeJsonParse(data.choices?.[0]?.message?.content ?? "{}");
 
-    return {
-      aiSummary: parsed.aiSummary || fallback.aiSummary,
-      whyItMatters: parsed.whyItMatters || fallback.whyItMatters,
-      keyPoints: Array.isArray(parsed.keyPoints) && parsed.keyPoints.length ? parsed.keyPoints.slice(0, 3) : fallback.keyPoints,
-      tags: Array.isArray(parsed.tags) && parsed.tags.length ? parsed.tags.slice(0, 8) : fallback.tags,
-      entities: { ...emptyEntities, ...(parsed.entities || {}) },
-      sentiment: ["negative", "neutral", "positive"].includes(parsed.sentiment || "") ? (parsed.sentiment as Sentiment) : fallback.sentiment,
-      impactLevel: ["low", "medium", "high"].includes(parsed.impactLevel || "") ? (parsed.impactLevel as ImpactLevel) : fallback.impactLevel
-    };
+    return normalizeAIEnrichment(parsed, fallback);
   } catch (error) {
-    console.error("[ai] enrichment failed", error);
-    return fallback;
+    console.error("[ai] OpenAI enrichment failed", error);
+    return null;
   }
 }
 
+export async function generateAIEnrichment(article: RawArticle): Promise<AIEnrichment> {
+  const fallback = fallbackAIEnrichment(article);
+  if (SKIP_AI_DURING_BUILD) return fallback;
+
+  const gemini = await generateGeminiEnrichment(article, fallback);
+  if (gemini) return gemini;
+
+  const openai = await generateOpenAIEnrichment(article, fallback);
+  if (openai) return openai;
+
+  return fallback;
+}
