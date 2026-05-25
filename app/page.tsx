@@ -1,6 +1,7 @@
 import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
+import { TrendingNow } from "@/components/TrendingNow";
 import { categories, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
 
@@ -13,6 +14,9 @@ export default async function Home() {
   const latest = news.slice(13, 19);
   const topCluster = news.slice(1, 5);
   const editorsPicks = news.slice(7, 11);
+  const mostRead = news.slice(2, 7);
+  const fastestGrowing = news.slice(7, 11);
+  const trendingTopics = ["OpenAI", "India markets", "Apple AI", "Oil prices", "Cybersecurity", "Streaming"];
 
   return (
     <main>
@@ -83,6 +87,7 @@ export default async function Home() {
           </div>
         </div>
         <aside className="right-rail">
+          <TrendingNow mostRead={mostRead} fastestGrowing={fastestGrowing} topics={trendingTopics} />
           <AdSlot label="Article rail" size="300 x 600" compact />
           <div className="briefing-box">
             <span>Newsletter</span>
