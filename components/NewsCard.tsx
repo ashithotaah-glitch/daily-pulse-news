@@ -34,7 +34,10 @@ export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: 
             {item.title}
           </a>
         </h3>
-        <p>{item.summary}</p>
+        <p>
+          <span className="ai-label">AI Summary:</span>
+          {item.aiSummary}
+        </p>
       </div>
     </article>
   );
