@@ -3,7 +3,6 @@ import Script from "next/script";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { readAdminStore } from "@/lib/admin/store";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -25,9 +24,11 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const store = await readAdminStore();
-  const adsense = store.adsenseSetup;
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const adsensePublisherId = process.env.ADSENSE_CLIENT_ID || siteConfig.adsenseClientId;
+  const adsenseMetaName = process.env.ADSENSE_META_NAME || "";
+  const adsenseMetaContent = process.env.ADSENSE_META_CONTENT || "";
+  const shouldInjectAdsense = adsensePublisherId && adsensePublisherId !== "ca-pub-0000000000000000";
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -49,25 +50,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="en">
       <head>
-        {adsense.injectMetaTag && adsense.metaName && adsense.metaContent ? (
-          <meta name={adsense.metaName} content={adsense.metaContent} />
-        ) : null}
+        {adsenseMetaName && adsenseMetaContent ? <meta name={adsenseMetaName} content={adsenseMetaContent} /> : null}
       </head>
       <body>
-        {adsense.injectHeadScript && adsense.publisherId ? (
-          <Script
-            id="flashfeed-adsense-setup"
-            async
-            strategy="beforeInteractive"
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsense.publisherId}`}
-            crossOrigin="anonymous"
-          />
-        ) : siteConfig.adsenseClientId !== "ca-pub-0000000000000000" ? (
+        {shouldInjectAdsense ? (
           <Script
             id="flashfeed-adsense-env"
             async
             strategy="beforeInteractive"
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsenseClientId}`}
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsensePublisherId}`}
             crossOrigin="anonymous"
           />
         ) : null}
