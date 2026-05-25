@@ -22,6 +22,8 @@ type TrendStat = {
 
 export type AdminDashboardStats = {
   totalArticles: number;
+  totalClusters: number;
+  totalSources: number;
   activeSources: number;
   failedSources: number;
   failedSourceNames: string[];
@@ -29,7 +31,9 @@ export type AdminDashboardStats = {
   totalUsers: number;
   savedArticles: number;
   topCategories: CategoryStat[];
+  topSources: CategoryStat[];
   trendingStories: TrendStat[];
+  adSlotsActive: number;
   adRevenuePlaceholder: string;
 };
 
@@ -79,11 +83,14 @@ export function AdminConsole({ dashboard }: { dashboard: AdminDashboardStats }) 
 
   const dashboardStats: DashboardStat[] = [
     { label: "Total articles fetched", value: dashboard.totalArticles.toLocaleString(), note: "Current normalized feed" },
+    { label: "Total clusters", value: dashboard.totalClusters.toLocaleString(), note: "AI story groups" },
+    { label: "Total sources", value: dashboard.totalSources.toLocaleString(), note: "Configured source records" },
     { label: "Active sources", value: dashboard.activeSources.toLocaleString(), note: "Enabled source adapters" },
     { label: "Failed sources", value: dashboard.failedSources.toLocaleString(), note: dashboard.failedSourceNames.join(", ") || "No failures detected" },
     { label: "AI summaries generated", value: dashboard.aiSummariesGenerated.toLocaleString(), note: "Includes cached/fallback summaries" },
     { label: "Total users", value: dashboard.totalUsers.toLocaleString(), note: "Database required for real user count" },
     { label: "Saved articles", value: Math.max(dashboard.savedArticles, localSavedCount).toLocaleString(), note: "This-device count until auth/database" },
+    { label: "Ad slots active", value: dashboard.adSlotsActive.toLocaleString(), note: "Live monetization placements" },
     { label: "Ad revenue", value: dashboard.adRevenuePlaceholder, note: "Connect AdSense reports later" }
   ];
 
@@ -145,6 +152,16 @@ export function AdminConsole({ dashboard }: { dashboard: AdminDashboardStats }) 
               <div className="category-meter" key={category.name}>
                 <span>{category.name}</span>
                 <strong>{category.count}</strong>
+              </div>
+            ))}
+          </section>
+
+          <section>
+            <h3>Top sources</h3>
+            {dashboard.topSources.map((source) => (
+              <div className="category-meter" key={source.name}>
+                <span>{source.name}</span>
+                <strong>{source.count}</strong>
               </div>
             ))}
           </section>

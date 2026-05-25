@@ -138,6 +138,10 @@ export function ReaderPersonalization({ initialArticles }: { initialArticles: Ne
     const value = query.trim();
     if (!value) return;
     setActiveTab("search");
+    navigator.sendBeacon?.(
+      "/api/events",
+      new Blob([JSON.stringify({ type: "search_query", label: value })], { type: "application/json" })
+    );
     try {
       const response = await fetch(`/api/search/ai?q=${encodeURIComponent(value)}`);
       setSearch(await response.json());

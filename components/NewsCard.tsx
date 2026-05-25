@@ -38,6 +38,17 @@ function writeList<T>(key: string, value: T[]) {
   }
 }
 
+function logEvent(type: string, label: string, value?: string) {
+  try {
+    navigator.sendBeacon?.(
+      "/api/events",
+      new Blob([JSON.stringify({ type, label, value })], { type: "application/json" })
+    );
+  } catch {
+    // Analytics must never block reading or saving a story.
+  }
+}
+
 export function NewsCard({
   item,
   feature = false,
@@ -48,6 +59,8 @@ export function NewsCard({
   relatedSourcesCount?: number;
 }) {
   function trackOpen(topic?: string) {
+    logEvent("article_view", item.title, item.id);
+    logEvent("source_click", item.sourceName, item.originalUrl);
     const history = readList<{
       articleId?: string;
       clusterId?: string;
@@ -91,6 +104,7 @@ export function NewsCard({
           ...saved
         ].slice(0, 100);
     writeList(SAVED_KEY, next);
+    if (!exists) logEvent("save_story", item.title, item.id);
   }
 
   return (

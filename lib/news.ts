@@ -4,6 +4,7 @@ export type {
   NewsCategory,
   NewsPipelineResult,
   Sentiment,
+  SourceAdapterType,
   SourceConfig,
   StandardArticle as NewsItem,
   StoryCluster,

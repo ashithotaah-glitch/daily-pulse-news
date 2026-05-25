@@ -5,6 +5,7 @@ import { ReaderPersonalization } from "@/components/ReaderPersonalization";
 import { TrendingNow } from "@/components/TrendingNow";
 import { categories, getClusters, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
+import { Fragment } from "react";
 
 export const revalidate = 600;
 
@@ -32,7 +33,7 @@ export default async function Home() {
   return (
     <main>
       <div className="top-ad-wrap">
-        <AdSlot label="Top billboard" size="970 x 250 responsive" />
+        <AdSlot label="Top billboard" size="970 x 250 responsive" placement="homepage_top" />
       </div>
 
       <section className="publisher-hero" id="top">
@@ -77,8 +78,11 @@ export default async function Home() {
           <h2>Happening now</h2>
         </div>
         <div className="story-grid instant-grid">
-          {instantUpdates.map((item) => (
-            <NewsCard item={item} key={item.id} relatedSourcesCount={sourcesByCluster.get(item.clusterId) || 1} />
+          {instantUpdates.map((item, index) => (
+            <Fragment key={item.id}>
+              <NewsCard item={item} key={item.id} relatedSourcesCount={sourcesByCluster.get(item.clusterId) || 1} />
+              {index === 5 ? <AdSlot label="In-feed sponsor" size="Fluid responsive" placement="feed_inline" key="feed-inline-ad" /> : null}
+            </Fragment>
           ))}
         </div>
       </section>
@@ -103,7 +107,7 @@ export default async function Home() {
         </div>
         <aside className="right-rail">
           <TrendingNow mostRead={mostRead} fastestGrowing={fastestGrowing} topics={trendingTopics} />
-          <AdSlot label="Article rail" size="300 x 600" compact />
+          <AdSlot label="Article rail" size="300 x 600" placement="sidebar" compact />
           <div className="briefing-box">
             <span>Newsletter</span>
             <strong>Flash Feed Morning</strong>
@@ -122,7 +126,7 @@ export default async function Home() {
       </section>
 
       <section className="mid-page-ad">
-        <AdSlot label="In-feed sponsor" size="Fluid responsive" />
+        <AdSlot label="In-feed sponsor" size="Fluid responsive" placement="feed_inline" />
       </section>
 
       {categories.map((category) => {
