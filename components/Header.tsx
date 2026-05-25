@@ -11,7 +11,8 @@ export function Header() {
         </Link>
         <div className="reader-actions">
           <Link href="/saved">Saved</Link>
-          <Link href="/#newsletter">Newsletter</Link>
+          <Link href="/newsletter">Newsletter</Link>
+          <Link href="/advertise">Advertise</Link>
           <Link className="support-link" href="/#membership">
             Subscribe
           </Link>
@@ -26,6 +27,7 @@ export function Header() {
         <Link href="/#entertainment">Culture</Link>
         <Link href="/#sports">Sports</Link>
         <Link href="/#health">Health</Link>
+        <Link href="/about">About</Link>
       </nav>
     </header>
   );

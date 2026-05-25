@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { categories, sourceConfigs } from "@/lib/news";
-import type { AdminStore, AdSlotRecord, AnalyticsEvent, ManagedCategory, ManagedSource } from "./types";
+import type { AdminStore, AdSlotRecord, AnalyticsEvent, ManagedCategory, ManagedSource, NewsletterSubscriber } from "./types";
 
 const STORE_PATH = path.join(process.cwd(), "data", "admin-store.json");
 
@@ -86,7 +86,8 @@ function defaultStore(): AdminStore {
       failedJobs: 0
     },
     events: [],
-    adSlots: defaultAdSlots()
+    adSlots: defaultAdSlots(),
+    newsletterSubscribers: []
   };
 }
 
@@ -148,6 +149,39 @@ export async function incrementAdMetric(id: string, metric: "impressions" | "cli
       slot.updatedAt = now();
     }
   });
+}
+
+export async function addNewsletterSubscriber(email: string, topics: string[] = [], source = "site") {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new Error("Invalid email address");
+  }
+
+  let subscriber: NewsletterSubscriber | undefined;
+  await updateAdminStore((store) => {
+    const existing = store.newsletterSubscribers.find((item) => item.email === normalizedEmail);
+    const updatedAt = now();
+    if (existing) {
+      existing.topics = [...new Set([...existing.topics, ...topics])].slice(0, 25);
+      existing.status = "active";
+      existing.updatedAt = updatedAt;
+      subscriber = existing;
+      return;
+    }
+
+    subscriber = {
+      id: `subscriber-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      email: normalizedEmail,
+      topics: [...new Set(topics)].slice(0, 25),
+      source,
+      status: "active",
+      createdAt: updatedAt,
+      updatedAt
+    };
+    store.newsletterSubscribers = [subscriber, ...store.newsletterSubscribers].slice(0, 10000);
+  });
+
+  return subscriber;
 }
 
 export function timestamp() {

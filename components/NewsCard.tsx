@@ -1,6 +1,7 @@
 "use client";
 
 import type { NewsItem } from "@/lib/news";
+import { StoryActions } from "./StoryActions";
 
 const SAVED_KEY = "flashfeed.savedStories.v1";
 const HISTORY_KEY = "flashfeed.readingHistory.v1";
@@ -114,10 +115,12 @@ export function NewsCard({
       </a>
       <div className="news-card-body">
         <div className="story-meta">
-          <span className="category-pill">{item.category.replace("-", " ")}</span>
+          <a className="category-pill" href={`/category/${item.category}`}>
+            {item.category.replace("-", " ")}
+          </a>
           <span className="source-line">
             <img src={item.sourceLogo} alt="" />
-            <span>{item.sourceName}</span>
+            <a href={`/source/${item.sourceName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{item.sourceName}</a>
             <time dateTime={item.publishedAt}>{relativeTime(item.publishedAt)}</time>
           </span>
         </div>
@@ -147,6 +150,7 @@ export function NewsCard({
             Read Source
           </a>
         </div>
+        <StoryActions item={item} />
       </div>
     </article>
   );

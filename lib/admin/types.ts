@@ -70,6 +70,16 @@ export type AnalyticsEvent = {
   createdAt: string;
 };
 
+export type NewsletterSubscriber = {
+  id: string;
+  email: string;
+  topics: string[];
+  source: string;
+  status: "active" | "unsubscribed";
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type AdSlotRecord = {
   id: string;
   name: string;
@@ -106,4 +116,5 @@ export type AdminStore = {
   aiSettings: AIAdminSettings;
   events: AnalyticsEvent[];
   adSlots: AdSlotRecord[];
+  newsletterSubscribers: NewsletterSubscriber[];
 };

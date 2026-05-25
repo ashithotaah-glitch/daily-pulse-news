@@ -2,6 +2,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
 import { ReaderPersonalization } from "@/components/ReaderPersonalization";
+import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { TrendingNow } from "@/components/TrendingNow";
 import { categories, getClusters, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
@@ -162,10 +163,7 @@ export default async function Home() {
           <p className="eyebrow">Newsletter</p>
           <h2>Start every morning with Flash Feed.</h2>
         </div>
-        <form>
-          <input type="email" placeholder="Email address" aria-label="Email address" />
-          <button type="button">Sign up</button>
-        </form>
+        <NewsletterSignup compact />
       </section>
     </main>
   );
