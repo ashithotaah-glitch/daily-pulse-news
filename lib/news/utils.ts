@@ -96,7 +96,10 @@ export function keywordOverlap(a: string, b: string) {
 
 export function variedFallbackImage(category: NewsCategory, seed: string) {
   const pool = categoryImagePools[category];
-  return pool[stableIndex(seed, pool.length)];
+  const baseImage = pool[stableIndex(seed, pool.length)];
+  const variant = stableIndex(`${category}-${seed}`, 1000);
+  const separator = baseImage.includes("?") ? "&" : "?";
+  return `${baseImage}${separator}crop=entropy&cs=tinysrgb&sig=${variant}`;
 }
 
 export function extractDescriptionImage(block: string) {
