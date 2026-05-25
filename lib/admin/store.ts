@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { categories, sourceConfigs } from "@/lib/news";
-import type { AdminStore, AdSlotRecord, AnalyticsEvent, ManagedCategory, ManagedSource, NewsletterSubscriber } from "./types";
+import type { AdminStore, AdSlotRecord, AdsenseSetup, AnalyticsEvent, ManagedCategory, ManagedSource, NewsletterSubscriber } from "./types";
 
 const STORE_PATH = path.join(process.cwd(), "data", "admin-store.json");
 
@@ -69,6 +69,24 @@ function defaultAdSlots(): AdSlotRecord[] {
   ];
 }
 
+function defaultAdsenseSetup(): AdsenseSetup {
+  return {
+    publisherId: "",
+    scriptSnippet: "",
+    adsTxtSnippet: "",
+    metaVerificationTag: "",
+    metaName: "",
+    metaContent: "",
+    autoAdsEnabled: false,
+    manualAdsEnabled: true,
+    injectHeadScript: false,
+    publishAdsTxt: false,
+    injectMetaTag: false,
+    status: "not_configured",
+    updatedAt: now()
+  };
+}
+
 function defaultStore(): AdminStore {
   return {
     sources: defaultSources(),
@@ -87,7 +105,8 @@ function defaultStore(): AdminStore {
     },
     events: [],
     adSlots: defaultAdSlots(),
-    newsletterSubscribers: []
+    newsletterSubscribers: [],
+    adsenseSetup: defaultAdsenseSetup()
   };
 }
 
@@ -98,7 +117,8 @@ async function ensureDataDir() {
 export async function readAdminStore(): Promise<AdminStore> {
   try {
     const raw = await fs.readFile(STORE_PATH, "utf8");
-    return { ...defaultStore(), ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return { ...defaultStore(), ...parsed, adsenseSetup: { ...defaultAdsenseSetup(), ...(parsed.adsenseSetup || {}) } };
   } catch {
     const store = defaultStore();
     await writeAdminStore(store);

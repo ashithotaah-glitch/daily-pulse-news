@@ -80,6 +80,24 @@ export type NewsletterSubscriber = {
   updatedAt: string;
 };
 
+export type AdsenseSetupStatus = "not_configured" | "code_added" | "verified" | "review_requested";
+
+export type AdsenseSetup = {
+  publisherId: string;
+  scriptSnippet: string;
+  adsTxtSnippet: string;
+  metaVerificationTag: string;
+  metaName: string;
+  metaContent: string;
+  autoAdsEnabled: boolean;
+  manualAdsEnabled: boolean;
+  injectHeadScript: boolean;
+  publishAdsTxt: boolean;
+  injectMetaTag: boolean;
+  status: AdsenseSetupStatus;
+  updatedAt: string;
+};
+
 export type AdSlotRecord = {
   id: string;
   name: string;
@@ -117,4 +135,5 @@ export type AdminStore = {
   events: AnalyticsEvent[];
   adSlots: AdSlotRecord[];
   newsletterSubscribers: NewsletterSubscriber[];
+  adsenseSetup: AdsenseSetup;
 };

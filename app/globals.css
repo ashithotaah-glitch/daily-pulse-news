@@ -1425,6 +1425,119 @@ textarea {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.adsense-status-row,
+.check-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.adsense-status-row article,
+.check-grid article {
+  background: #f7f5ef;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.adsense-status-row span,
+.check-grid span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.adsense-status-row strong,
+.check-grid strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+.adsense-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.adsense-form-grid label {
+  color: var(--muted);
+  display: grid;
+  font-size: 12px;
+  font-weight: 900;
+  gap: 7px;
+  text-transform: uppercase;
+}
+
+.adsense-form-grid label.wide {
+  grid-column: 1 / -1;
+}
+
+.adsense-form-grid input,
+.adsense-form-grid select,
+.adsense-form-grid textarea {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  min-width: 0;
+  padding: 10px;
+  text-transform: none;
+}
+
+.adsense-form-grid textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.admin-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-action-row button {
+  background: var(--ink);
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  padding: 10px 12px;
+}
+
+.admin-action-row button:nth-child(2),
+.admin-action-row button:nth-child(3) {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.check-pass strong {
+  color: var(--accent-2);
+}
+
+.check-pending strong {
+  color: var(--accent);
+}
+
+.review-checklist {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.review-checklist span {
+  background: #edf1eb;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 8px 10px;
+}
+
 .mini-panel {
   margin-top: 12px;
 }
@@ -2115,6 +2228,9 @@ textarea {
   .admin-shell,
   .admin-form-row,
   .settings-grid,
+  .adsense-status-row,
+  .adsense-form-grid,
+  .check-grid,
   .monetization-form {
     grid-template-columns: 1fr;
   }
@@ -2188,6 +2304,7 @@ textarea {
   .story-grid,
   .story-grid.compact,
   .inventory-list,
+  .review-checklist,
   .dashboard-stat-grid {
     grid-template-columns: 1fr;
   }

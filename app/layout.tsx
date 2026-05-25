@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { Header } from "@/components/Header";
+import { readAdminStore } from "@/lib/admin/store";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -23,7 +24,9 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const store = await readAdminStore();
+  const adsense = store.adsenseSetup;
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -44,13 +47,29 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
   return (
     <html lang="en">
+      <head>
+        {adsense.injectMetaTag && adsense.metaName && adsense.metaContent ? (
+          <meta name={adsense.metaName} content={adsense.metaContent} />
+        ) : null}
+      </head>
       <body>
-        <Script
-          async
-          strategy="afterInteractive"
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsenseClientId}`}
-          crossOrigin="anonymous"
-        />
+        {adsense.injectHeadScript && adsense.publisherId ? (
+          <Script
+            id="flashfeed-adsense-setup"
+            async
+            strategy="beforeInteractive"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsense.publisherId}`}
+            crossOrigin="anonymous"
+          />
+        ) : siteConfig.adsenseClientId !== "ca-pub-0000000000000000" ? (
+          <Script
+            id="flashfeed-adsense-env"
+            async
+            strategy="beforeInteractive"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${siteConfig.adsenseClientId}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
         <Script
           id="flashfeed-schema"
           type="application/ld+json"

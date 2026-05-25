@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/ai", label: "AI" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/monetization", label: "Monetization" },
+  { href: "/admin/monetization/adsense-setup", label: "AdSense Setup" },
   { href: "/admin/settings", label: "Settings" }
 ];
 
@@ -36,7 +37,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav aria-label="Admin navigation">
           {navItems.map((item) => (
-            <Link className={pathname === item.href ? "active" : ""} href={item.href as never} key={item.href}>
+            <Link className={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "active" : ""} href={item.href as never} key={item.href}>
               {item.label}
             </Link>
           ))}
