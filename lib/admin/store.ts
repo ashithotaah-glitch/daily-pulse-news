@@ -120,9 +120,10 @@ export async function readAdminStore(): Promise<AdminStore> {
     const parsed = JSON.parse(raw);
     return { ...defaultStore(), ...parsed, adsenseSetup: { ...defaultAdsenseSetup(), ...(parsed.adsenseSetup || {}) } };
   } catch {
-    const store = defaultStore();
-    await writeAdminStore(store);
-    return store;
+    // Public pages read admin-backed settings for safe AdSense injection.
+    // Reads must never attempt filesystem writes, because shared hosts may
+    // block writes during first request and that would take the site down.
+    return defaultStore();
   }
 }
 
