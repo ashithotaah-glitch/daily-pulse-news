@@ -1055,6 +1055,114 @@ textarea {
   margin: 0 0 18px;
 }
 
+.dashboard-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.dashboard-heading {
+  align-items: flex-end;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding-bottom: 14px;
+}
+
+.dashboard-heading h2 {
+  margin: 0;
+}
+
+.dashboard-heading > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.dashboard-stat-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.dashboard-stat-grid article {
+  background: #f7f5ef;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  gap: 6px;
+  min-height: 118px;
+  padding: 14px;
+}
+
+.dashboard-stat-grid span,
+.dashboard-insights h3 {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.dashboard-stat-grid strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 34px;
+  line-height: 1;
+}
+
+.dashboard-stat-grid small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.dashboard-insights {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 0.8fr 1.2fr;
+}
+
+.dashboard-insights section {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.category-meter,
+.trend-row {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding-top: 10px;
+}
+
+.category-meter span,
+.trend-row span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.category-meter strong,
+.trend-row b {
+  background: #edf1eb;
+  border-radius: 999px;
+  color: var(--accent-2);
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.trend-row strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
 .admin-panel label {
   color: var(--muted);
   display: grid;
@@ -1145,8 +1253,13 @@ textarea {
   .lead-layout,
   .lead-story,
   .admin-grid,
-  .inventory {
+  .inventory,
+  .dashboard-insights {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .right-rail {
@@ -1198,7 +1311,8 @@ textarea {
   .market-strip,
   .story-grid,
   .story-grid.compact,
-  .inventory-list {
+  .inventory-list,
+  .dashboard-stat-grid {
     grid-template-columns: 1fr;
   }
 

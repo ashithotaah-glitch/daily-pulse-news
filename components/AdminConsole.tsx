@@ -1,7 +1,37 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { siteConfig } from "@/lib/site";
+
+type DashboardStat = {
+  label: string;
+  value: string;
+  note: string;
+};
+
+type CategoryStat = {
+  name: string;
+  count: number;
+};
+
+type TrendStat = {
+  title: string;
+  source: string;
+  trendScore: number;
+};
+
+export type AdminDashboardStats = {
+  totalArticles: number;
+  activeSources: number;
+  failedSources: number;
+  failedSourceNames: string[];
+  aiSummariesGenerated: number;
+  totalUsers: number;
+  savedArticles: number;
+  topCategories: CategoryStat[];
+  trendingStories: TrendStat[];
+  adRevenuePlaceholder: string;
+};
 
 const revenueSlots = [
   { name: "Top leaderboard", format: "970x250 / responsive", placement: "Homepage header", yield: "High" },
@@ -34,9 +64,10 @@ const initialSettings: Settings = {
   programmaticAds: true
 };
 
-export function AdminConsole() {
+export function AdminConsole({ dashboard }: { dashboard: AdminDashboardStats }) {
   const [settings, setSettings] = useState(initialSettings);
   const [saved, setSaved] = useState(false);
+  const [localSavedCount, setLocalSavedCount] = useState(0);
 
   const seoScore = useMemo(() => {
     let score = 40;
@@ -45,6 +76,25 @@ export function AdminConsole() {
     if (settings.adsenseClient.startsWith("ca-pub-")) score += 15;
     return Math.min(score, 100);
   }, [settings]);
+
+  const dashboardStats: DashboardStat[] = [
+    { label: "Total articles fetched", value: dashboard.totalArticles.toLocaleString(), note: "Current normalized feed" },
+    { label: "Active sources", value: dashboard.activeSources.toLocaleString(), note: "Enabled source adapters" },
+    { label: "Failed sources", value: dashboard.failedSources.toLocaleString(), note: dashboard.failedSourceNames.join(", ") || "No failures detected" },
+    { label: "AI summaries generated", value: dashboard.aiSummariesGenerated.toLocaleString(), note: "Includes cached/fallback summaries" },
+    { label: "Total users", value: dashboard.totalUsers.toLocaleString(), note: "Database required for real user count" },
+    { label: "Saved articles", value: Math.max(dashboard.savedArticles, localSavedCount).toLocaleString(), note: "This-device count until auth/database" },
+    { label: "Ad revenue", value: dashboard.adRevenuePlaceholder, note: "Connect AdSense reports later" }
+  ];
+
+  useEffect(() => {
+    try {
+      const savedStories = JSON.parse(window.localStorage.getItem("flashfeed.savedStories.v1") || "[]");
+      setLocalSavedCount(Array.isArray(savedStories) ? savedStories.length : 0);
+    } catch {
+      setLocalSavedCount(0);
+    }
+  }, []);
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     setSaved(false);
@@ -66,6 +116,51 @@ export function AdminConsole() {
         <div className="score-card">
           <span>SEO readiness</span>
           <strong>{seoScore}%</strong>
+        </div>
+      </section>
+
+      <section className="admin-panel dashboard-panel">
+        <div className="dashboard-heading">
+          <div>
+            <p className="eyebrow">Dashboard</p>
+            <h2>Platform overview</h2>
+          </div>
+          <span>Live pipeline snapshot</span>
+        </div>
+
+        <div className="dashboard-stat-grid">
+          {dashboardStats.map((stat) => (
+            <article key={stat.label}>
+              <span>{stat.label}</span>
+              <strong>{stat.value}</strong>
+              <small>{stat.note}</small>
+            </article>
+          ))}
+        </div>
+
+        <div className="dashboard-insights">
+          <section>
+            <h3>Top categories</h3>
+            {dashboard.topCategories.map((category) => (
+              <div className="category-meter" key={category.name}>
+                <span>{category.name}</span>
+                <strong>{category.count}</strong>
+              </div>
+            ))}
+          </section>
+
+          <section>
+            <h3>Trending stories</h3>
+            {dashboard.trendingStories.map((story) => (
+              <article className="trend-row" key={story.title}>
+                <div>
+                  <strong>{story.title}</strong>
+                  <span>{story.source}</span>
+                </div>
+                <b>{story.trendScore}</b>
+              </article>
+            ))}
+          </section>
         </div>
       </section>
 
