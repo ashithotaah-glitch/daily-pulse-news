@@ -6,16 +6,16 @@ import { NewsCard } from "@/components/NewsCard";
 import { ReaderPersonalization } from "@/components/ReaderPersonalization";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { TrendingNow } from "@/components/TrendingNow";
-import { buildLiveSnapshot, categories, getClusters, getFeatured, getNews, getTopics } from "@/lib/news";
-import { siteConfig } from "@/lib/site";
+import { buildLiveSnapshot, categories, getFeatured, getInstantNewsPipeline } from "@/lib/news";
 import { Fragment } from "react";
 
 export const revalidate = 600;
 
-export default async function Home() {
-  const news = await getNews();
-  const clusters = await getClusters();
-  const topics = await getTopics();
+export default function Home() {
+  const result = getInstantNewsPipeline();
+  const news = result.articles;
+  const clusters = result.clusters;
+  const topics = result.topics;
   const featured = getFeatured(news);
   if (!featured) {
     return (

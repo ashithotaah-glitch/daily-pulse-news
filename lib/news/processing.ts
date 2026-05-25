@@ -259,6 +259,10 @@ function fallbackResult(): NewsPipelineResult {
   };
 }
 
+export function getInstantNewsPipeline(): NewsPipelineResult {
+  return getCachedPipeline() ?? getStalePipeline() ?? fallbackResult();
+}
+
 export async function runNewsPipeline(): Promise<NewsPipelineResult> {
   const cached = getCachedPipeline();
   if (cached) return cached;
