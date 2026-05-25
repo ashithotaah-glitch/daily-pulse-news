@@ -10,8 +10,9 @@ export function Header() {
           <strong>{siteConfig.name}</strong>
         </Link>
         <div className="reader-actions">
-          <Link href="#newsletter">Newsletter</Link>
-          <Link className="support-link" href="#membership">
+          <Link href="/saved">Saved</Link>
+          <Link href="/#newsletter">Newsletter</Link>
+          <Link className="support-link" href="/#membership">
             Subscribe
           </Link>
         </div>

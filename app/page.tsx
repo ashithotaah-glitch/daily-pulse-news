@@ -1,6 +1,7 @@
 import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
+import { ReaderPersonalization } from "@/components/ReaderPersonalization";
 import { TrendingNow } from "@/components/TrendingNow";
 import { categories, getClusters, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
@@ -67,6 +68,8 @@ export default async function Home() {
       </section>
 
       <CategoryTabs />
+
+      <ReaderPersonalization initialArticles={news.slice(0, 12)} />
 
       <section className="instant-news" id="latest">
         <div className="section-heading">

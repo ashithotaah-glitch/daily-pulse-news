@@ -12,6 +12,15 @@ export type {
 export { categories, sourceConfigs } from "./news/source-config";
 export { categoryImages } from "./news/images";
 export { runNewsPipeline, sortArticles } from "./news/processing";
+export {
+  emptyReaderProfile,
+  getPersonalizedBriefing,
+  hasPersonalization,
+  parseReaderProfile,
+  personalizeArticles,
+  searchNewsData
+} from "./news/personalization";
+export type { ReaderProfile, ReadingEvent, SavedStorySnapshot } from "./news/personalization";
 
 import { categoryImages } from "./news/images";
 import { runNewsPipeline } from "./news/processing";

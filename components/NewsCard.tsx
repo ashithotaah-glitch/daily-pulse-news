@@ -1,4 +1,9 @@
+"use client";
+
 import type { NewsItem } from "@/lib/news";
+
+const SAVED_KEY = "flashfeed.savedStories.v1";
+const HISTORY_KEY = "flashfeed.readingHistory.v1";
 
 function relativeTime(value: string) {
   const published = Date.parse(value);
@@ -14,6 +19,25 @@ function relativeTime(value: string) {
   return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 }
 
+function readList<T>(key: string): T[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const value = window.localStorage.getItem(key);
+    return value ? (JSON.parse(value) as T[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeList<T>(key: string, value: T[]) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+    window.dispatchEvent(new CustomEvent("flashfeed:profile-changed"));
+  } catch {
+    // localStorage can fail in private browsing; the article card should still work.
+  }
+}
+
 export function NewsCard({
   item,
   feature = false,
@@ -23,9 +47,55 @@ export function NewsCard({
   feature?: boolean;
   relatedSourcesCount?: number;
 }) {
+  function trackOpen(topic?: string) {
+    const history = readList<{
+      articleId?: string;
+      clusterId?: string;
+      category?: string;
+      source?: string;
+      topic?: string;
+      openedAt: string;
+    }>(HISTORY_KEY);
+    writeList(HISTORY_KEY, [
+      ...history,
+      {
+        articleId: item.id,
+        clusterId: item.clusterId,
+        category: item.category,
+        source: item.sourceName,
+        topic,
+        openedAt: new Date().toISOString()
+      }
+    ].slice(-200));
+  }
+
+  function saveStory() {
+    const saved = readList<{
+      articleId?: string;
+      clusterId?: string;
+      title: string;
+      source: string;
+      savedAt: string;
+    }>(SAVED_KEY);
+    const exists = saved.some((story) => story.articleId === item.id || story.clusterId === item.clusterId);
+    const next = exists
+      ? saved.filter((story) => story.articleId !== item.id && story.clusterId !== item.clusterId)
+      : [
+          {
+            articleId: item.id,
+            clusterId: item.clusterId,
+            title: item.title,
+            source: item.sourceName,
+            savedAt: new Date().toISOString()
+          },
+          ...saved
+        ].slice(0, 100);
+    writeList(SAVED_KEY, next);
+  }
+
   return (
     <article className={feature ? "news-card feature" : "news-card"}>
-      <a className="image-link" href={item.originalUrl} target="_blank" rel="noreferrer" aria-label={item.title}>
+      <a className="image-link" href={item.originalUrl} target="_blank" rel="noreferrer" aria-label={item.title} onClick={() => trackOpen()}>
         <span style={{ backgroundImage: `url(${item.imageUrl})` }} />
       </a>
       <div className="news-card-body">
@@ -38,7 +108,7 @@ export function NewsCard({
           </span>
         </div>
         <h3>
-          <a href={item.originalUrl} target="_blank" rel="noreferrer">
+          <a href={item.originalUrl} target="_blank" rel="noreferrer" onClick={() => trackOpen()}>
             {item.title}
           </a>
         </h3>
@@ -55,9 +125,14 @@ export function NewsCard({
           <span>Trend {item.trendScore}</span>
           <span>{relatedSourcesCount} source{relatedSourcesCount === 1 ? "" : "s"}</span>
         </footer>
-        <a className="read-source" href={item.originalUrl} target="_blank" rel="noreferrer">
-          Read Source
-        </a>
+        <div className="card-actions">
+          <button className="bookmark-button" type="button" onClick={saveStory} aria-label={`Save ${item.title}`}>
+            Save
+          </button>
+          <a className="read-source" href={item.originalUrl} target="_blank" rel="noreferrer" onClick={() => trackOpen(item.tags[0])}>
+            Read Source
+          </a>
+        </div>
       </div>
     </article>
   );
