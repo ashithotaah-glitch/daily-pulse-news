@@ -4,6 +4,7 @@ import { canonicalUrl, keywordSet, stripTags } from "./utils";
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const SKIP_AI_DURING_BUILD = process.env.NEXT_PHASE === "phase-production-build";
+const AI_TIMEOUT_MS = Number(process.env.AI_TIMEOUT_MS || 3500);
 
 const emptyEntities: StandardArticle["entities"] = {
   people: [],
@@ -129,12 +130,26 @@ function enrichmentPrompt(article: RawArticle) {
   });
 }
 
+async function fetchWithTimeout(url: string, init: RequestInit) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function generateGeminiEnrichment(article: RawArticle, fallback: AIEnrichment): Promise<AIEnrichment | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
   try {
-    const response = await fetch(
+    const response = await fetchWithTimeout(
       `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
       {
         method: "POST",
@@ -171,7 +186,7 @@ async function generateOpenAIEnrichment(article: RawArticle, fallback: AIEnrichm
   if (!apiKey) return null;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetchWithTimeout("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -206,9 +221,9 @@ async function generateOpenAIEnrichment(article: RawArticle, fallback: AIEnrichm
   }
 }
 
-export async function generateAIEnrichment(article: RawArticle): Promise<AIEnrichment> {
+export async function generateAIEnrichment(article: RawArticle, options: { live?: boolean } = {}): Promise<AIEnrichment> {
   const fallback = fallbackAIEnrichment(article);
-  if (SKIP_AI_DURING_BUILD) return fallback;
+  if (SKIP_AI_DURING_BUILD || options.live === false) return fallback;
 
   const gemini = await generateGeminiEnrichment(article, fallback);
   if (gemini) return gemini;

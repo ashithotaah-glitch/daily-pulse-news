@@ -1,4 +1,4 @@
-import { generateAIEnrichment } from "./ai";
+import { fallbackAIEnrichment, generateAIEnrichment } from "./ai";
 import { getAdapter } from "./adapters";
 import { getCachedAI, getCachedPipeline, getStalePipeline, setCachedAI, setCachedPipeline } from "./cache";
 import { sourceConfigs } from "./source-config";
@@ -8,6 +8,8 @@ import { scoreArticle } from "./scoring";
 import { categories } from "./source-config";
 
 const MIN_LIVE_ITEMS = 8;
+const MAX_PIPELINE_ARTICLES = Number(process.env.MAX_PIPELINE_ARTICLES || 72);
+const LIVE_AI_ENRICHMENT_LIMIT = Number(process.env.LIVE_AI_ENRICHMENT_LIMIT || 0);
 
 function articleId(article: RawArticle) {
   return `${article.sourceName}-${canonicalUrl(article.canonicalUrl || article.originalUrl)}`.toLowerCase();
@@ -224,12 +226,12 @@ function makeFallbackArticles(): StandardArticle[] {
   });
 }
 
-async function enrichArticle(raw: RawArticle): Promise<StandardArticle> {
+async function enrichArticle(raw: RawArticle, allowLiveAI: boolean): Promise<StandardArticle> {
   const normalized = normalizedTitle(raw.title);
   const id = articleId(raw);
   const cached = getCachedAI(id);
-  const enrichment = cached || (await generateAIEnrichment(raw));
-  if (!cached) setCachedAI(id, enrichment);
+  const enrichment = cached || (allowLiveAI ? await generateAIEnrichment(raw) : fallbackAIEnrichment(raw));
+  if (!cached && allowLiveAI) setCachedAI(id, enrichment);
 
   return {
     ...raw,
@@ -262,12 +264,16 @@ export async function runNewsPipeline(): Promise<NewsPipelineResult> {
   if (cached) return cached;
 
   try {
-    const rawArticles = await fetchRawArticles();
+    const rawArticles = (await fetchRawArticles())
+      .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt))
+      .slice(0, MAX_PIPELINE_ARTICLES);
     if (rawArticles.length < MIN_LIVE_ITEMS) {
       return getStalePipeline() ?? fallbackResult();
     }
 
-    const enriched = await Promise.all(rawArticles.map(enrichArticle));
+    const enriched = await Promise.all(
+      rawArticles.map((article, index) => enrichArticle(article, index < LIVE_AI_ENRICHMENT_LIMIT))
+    );
     const withDuplicates = markDuplicates(enriched).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
     const clusters = buildClusters(withDuplicates);
 
