@@ -1,5 +1,19 @@
 import type { NewsItem } from "@/lib/news";
 
+function relativeTime(value: string) {
+  const published = Date.parse(value);
+  if (Number.isNaN(published)) return "Just now";
+
+  const diffMinutes = Math.max(1, Math.round((Date.now() - published) / 60000));
+  if (diffMinutes < 60) return `${diffMinutes} min ago`;
+
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours} hr ago`;
+
+  const diffDays = Math.round(diffHours / 24);
+  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+}
+
 export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: boolean }) {
   return (
     <article className={feature ? "news-card feature" : "news-card"}>
@@ -8,12 +22,12 @@ export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: 
       </a>
       <div className="news-card-body">
         <div className="story-meta">
-          <span>{item.category.replace("-", " ")}</span>
-          <time dateTime={item.publishedAt}>
-            {new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "numeric" }).format(
-              new Date(item.publishedAt)
-            )}
-          </time>
+          <span className="category-pill">{item.category.replace("-", " ")}</span>
+          <span className="source-line">
+            <img src={item.sourceIcon} alt="" />
+            <span>{item.source}</span>
+            <time dateTime={item.publishedAt}>{relativeTime(item.publishedAt)}</time>
+          </span>
         </div>
         <h3>
           <a href={item.url} target="_blank" rel="noreferrer">
@@ -21,10 +35,6 @@ export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: 
           </a>
         </h3>
         <p>{item.summary}</p>
-        <footer>
-          <span>{item.source}</span>
-          <small>Developing story</small>
-        </footer>
       </div>
     </article>
   );

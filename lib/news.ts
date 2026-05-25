@@ -19,6 +19,7 @@ export type NewsItem = {
   category: NewsCategory;
   publishedAt: string;
   image: string;
+  sourceIcon: string;
 };
 
 export const categories: { id: NewsCategory; label: string; query: string }[] = [
@@ -57,7 +58,8 @@ const fallbackNews: NewsItem[] = categories.flatMap((category, index) => [
     url: "#",
     category: category.id,
     publishedAt: new Date(Date.now() - index * 3600000).toISOString(),
-    image: categoryImages[category.id]
+    image: categoryImages[category.id],
+    sourceIcon: faviconForUrl("https://flashfeed.blog")
   }
 ]);
 
@@ -88,6 +90,15 @@ function sourceFromUrl(url: string) {
   }
 }
 
+function faviconForUrl(url: string) {
+  try {
+    const hostname = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`;
+  } catch {
+    return "https://www.google.com/s2/favicons?domain=flashfeed.blog&sz=64";
+  }
+}
+
 async function fetchCategoryFeed(category: (typeof categories)[number]): Promise<NewsItem[]> {
   const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(category.query)}&hl=en-US&gl=US&ceid=US:en`;
   const response = await fetch(feedUrl, { next: { revalidate: 3600 } });
@@ -113,7 +124,8 @@ async function fetchCategoryFeed(category: (typeof categories)[number]): Promise
       url: rawUrl,
       category: category.id,
       publishedAt,
-      image: categoryImages[category.id]
+      image: categoryImages[category.id],
+      sourceIcon: faviconForUrl(rawUrl)
     };
   });
 }

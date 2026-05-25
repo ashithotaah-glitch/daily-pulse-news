@@ -114,6 +114,7 @@ textarea {
 
 .top-ad-wrap,
 .publisher-hero,
+.instant-news,
 .layout-grid,
 .category-section,
 .story-grid,
@@ -328,6 +329,16 @@ textarea {
   padding-top: 12px;
 }
 
+.instant-news {
+  border-top: 1px solid var(--line);
+  padding-bottom: 34px;
+  padding-top: 34px;
+}
+
+.instant-grid {
+  padding: 0;
+}
+
 .story-grid.inline-grid {
   padding: 0;
 }
@@ -358,6 +369,7 @@ textarea {
   background-position: center;
   background-size: cover;
   display: block;
+  flex: 0 0 auto;
   min-height: 100%;
 }
 
@@ -371,7 +383,7 @@ textarea {
 
 .story-meta,
 .news-card footer {
-  align-items: center;
+  align-items: flex-start;
   color: var(--muted);
   display: flex;
   flex-wrap: wrap;
@@ -380,6 +392,40 @@ textarea {
   gap: 10px;
   justify-content: space-between;
   text-transform: uppercase;
+}
+
+.category-pill {
+  background: #f3eee4;
+  border-radius: 999px;
+  color: var(--accent);
+  padding: 5px 8px;
+}
+
+.source-line {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+  min-width: 0;
+  text-transform: none;
+}
+
+.source-line img {
+  border-radius: 4px;
+  flex: 0 0 auto;
+  height: 16px;
+  width: 16px;
+}
+
+.source-line span {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-line time::before {
+  content: "•";
+  margin-right: 6px;
 }
 
 .news-card h3 {
@@ -395,8 +441,12 @@ textarea {
 
 .news-card p {
   color: #4f5a55;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   line-height: 1.55;
   margin: 0;
+  overflow: hidden;
 }
 
 .news-card footer {

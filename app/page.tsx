@@ -9,7 +9,8 @@ export const revalidate = 1800;
 export default async function Home() {
   const news = await getNews();
   const featured = getFeatured(news);
-  const latest = news.slice(1, 7);
+  const instantUpdates = news.slice(1, 13);
+  const latest = news.slice(13, 19);
   const topCluster = news.slice(1, 5);
   const editorsPicks = news.slice(7, 11);
 
@@ -51,13 +52,25 @@ export default async function Home() {
 
       <CategoryTabs />
 
+      <section className="instant-news" id="latest">
+        <div className="section-heading">
+          <p className="eyebrow">Latest Updates</p>
+          <h2>Happening now</h2>
+        </div>
+        <div className="story-grid instant-grid">
+          {instantUpdates.map((item) => (
+            <NewsCard item={item} key={item.id} />
+          ))}
+        </div>
+      </section>
+
       <section className="market-strip" aria-label="Flash Feed coverage">
         {["Live feed updates", "10 core categories", "Global coverage", "Fast briefings"].map((metric) => (
           <span key={metric}>{metric}</span>
         ))}
       </section>
 
-      <section className="layout-grid" id="latest">
+      <section className="layout-grid">
         <div>
           <div className="section-heading">
             <p className="eyebrow">Latest</p>
