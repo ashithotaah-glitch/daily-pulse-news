@@ -450,6 +450,18 @@ textarea {
   overflow: hidden;
 }
 
+.why-it-matters {
+  background: #f7f5ef;
+  border-left: 3px solid var(--gold);
+  padding: 8px;
+}
+
+.why-it-matters span {
+  color: var(--ink);
+  font-weight: 900;
+  margin-right: 5px;
+}
+
 .ai-label {
   color: var(--accent-2);
   display: inline;
@@ -457,6 +469,52 @@ textarea {
   font-weight: 900;
   margin-right: 6px;
   text-transform: uppercase;
+}
+
+.card-intel {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.card-intel span {
+  background: #eef1ec;
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 7px;
+  text-transform: uppercase;
+}
+
+.card-intel .impact.high {
+  background: #ffe8e4;
+  color: #a52820;
+}
+
+.card-intel .impact.medium {
+  background: #fff3d6;
+  color: #895c00;
+}
+
+.card-intel .impact.low {
+  background: #e8f5ef;
+  color: var(--accent-2);
+}
+
+.read-source {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  justify-content: center;
+  padding: 8px 10px;
 }
 
 .news-card footer {

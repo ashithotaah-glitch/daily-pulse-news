@@ -17,7 +17,7 @@ export function TrendingNow({ mostRead, fastestGrowing, topics }: TrendingNowPro
       <div className="trend-section">
         <h2>Most Read</h2>
         {mostRead.map((item, index) => (
-          <a href={item.url} target="_blank" rel="noreferrer" key={item.id}>
+          <a href={item.originalUrl} target="_blank" rel="noreferrer" key={item.id}>
             <b>{index + 1}</b>
             <span>{item.title}</span>
           </a>
@@ -27,7 +27,7 @@ export function TrendingNow({ mostRead, fastestGrowing, topics }: TrendingNowPro
       <div className="trend-section">
         <h2>Fastest Growing</h2>
         {fastestGrowing.map((item) => (
-          <a href={item.url} target="_blank" rel="noreferrer" key={item.id}>
+          <a href={item.originalUrl} target="_blank" rel="noreferrer" key={item.id}>
             <i>{item.category.replace("-", " ")}</i>
             <span>{item.title}</span>
           </a>

@@ -2,14 +2,23 @@ import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
 import { TrendingNow } from "@/components/TrendingNow";
-import { categories, getFeatured, getNews } from "@/lib/news";
+import { categories, getClusters, getFeatured, getNews } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 600;
 
 export default async function Home() {
   const news = await getNews();
+  const clusters = await getClusters();
   const featured = getFeatured(news);
+  if (!featured) {
+    return (
+      <main className="empty-state">
+        <h1>Flash Feed is warming up</h1>
+        <p>News intelligence is loading. Please refresh shortly.</p>
+      </main>
+    );
+  }
   const instantUpdates = news.slice(1, 13);
   const latest = news.slice(13, 19);
   const topCluster = news.slice(1, 5);
@@ -17,6 +26,7 @@ export default async function Home() {
   const mostRead = news.slice(2, 7);
   const fastestGrowing = news.slice(7, 11);
   const trendingTopics = ["OpenAI", "India markets", "Apple AI", "Oil prices", "Cybersecurity", "Streaming"];
+  const sourcesByCluster = new Map(clusters.map((cluster) => [cluster.clusterId, cluster.sourcesCount]));
 
   return (
     <main>
@@ -28,24 +38,26 @@ export default async function Home() {
         <div className="section-kicker">Live global briefing</div>
         <div className="lead-layout">
           <article className="lead-story">
-            <a className="lead-image" href={featured.url} target="_blank" rel="noreferrer">
-              <span style={{ backgroundImage: `url(${featured.image})` }} />
+            <a className="lead-image" href={featured.originalUrl} target="_blank" rel="noreferrer">
+              <span style={{ backgroundImage: `url(${featured.imageUrl})` }} />
             </a>
             <div className="lead-copy">
               <p className="eyebrow">{featured.category.replace("-", " ")}</p>
               <h1>
-                <a href={featured.url} target="_blank" rel="noreferrer">
+                <a href={featured.originalUrl} target="_blank" rel="noreferrer">
                   {featured.title}
                 </a>
               </h1>
-              <p>{featured.summary}</p>
-              <small>{featured.source}</small>
+              <p>{featured.aiSummary}</p>
+              <small>
+                {featured.sourceName} / {featured.impactLevel} impact / Trend {featured.trendScore}
+              </small>
             </div>
           </article>
           <aside className="top-stories">
             <h2>Top Stories</h2>
             {topCluster.map((item) => (
-              <a href={item.url} target="_blank" rel="noreferrer" key={item.id}>
+              <a href={item.originalUrl} target="_blank" rel="noreferrer" key={item.id}>
                 <span>{item.category.replace("-", " ")}</span>
                 <strong>{item.title}</strong>
               </a>
@@ -63,7 +75,7 @@ export default async function Home() {
         </div>
         <div className="story-grid instant-grid">
           {instantUpdates.map((item) => (
-            <NewsCard item={item} key={item.id} />
+            <NewsCard item={item} key={item.id} relatedSourcesCount={sourcesByCluster.get(item.clusterId) || 1} />
           ))}
         </div>
       </section>
@@ -82,7 +94,7 @@ export default async function Home() {
           </div>
           <div className="story-grid inline-grid">
             {latest.map((item) => (
-              <NewsCard item={item} key={item.id} />
+              <NewsCard item={item} key={item.id} relatedSourcesCount={sourcesByCluster.get(item.clusterId) || 1} />
             ))}
           </div>
         </div>
@@ -98,7 +110,7 @@ export default async function Home() {
           <section className="editors-box">
             <h2>Editor Picks</h2>
             {editorsPicks.map((item) => (
-              <a href={item.url} target="_blank" rel="noreferrer" key={item.id}>
+              <a href={item.originalUrl} target="_blank" rel="noreferrer" key={item.id}>
                 {item.title}
               </a>
             ))}
@@ -122,7 +134,7 @@ export default async function Home() {
             </div>
             <div className="story-grid compact">
               {items.map((item) => (
-                <NewsCard item={item} key={item.id} />
+                <NewsCard item={item} key={item.id} relatedSourcesCount={sourcesByCluster.get(item.clusterId) || 1} />
               ))}
             </div>
           </section>

@@ -14,23 +14,31 @@ function relativeTime(value: string) {
   return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
 }
 
-export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: boolean }) {
+export function NewsCard({
+  item,
+  feature = false,
+  relatedSourcesCount = 1
+}: {
+  item: NewsItem;
+  feature?: boolean;
+  relatedSourcesCount?: number;
+}) {
   return (
     <article className={feature ? "news-card feature" : "news-card"}>
-      <a className="image-link" href={item.url} target="_blank" rel="noreferrer" aria-label={item.title}>
-        <span style={{ backgroundImage: `url(${item.image})` }} />
+      <a className="image-link" href={item.originalUrl} target="_blank" rel="noreferrer" aria-label={item.title}>
+        <span style={{ backgroundImage: `url(${item.imageUrl})` }} />
       </a>
       <div className="news-card-body">
         <div className="story-meta">
           <span className="category-pill">{item.category.replace("-", " ")}</span>
           <span className="source-line">
-            <img src={item.sourceIcon} alt="" />
-            <span>{item.source}</span>
+            <img src={item.sourceLogo} alt="" />
+            <span>{item.sourceName}</span>
             <time dateTime={item.publishedAt}>{relativeTime(item.publishedAt)}</time>
           </span>
         </div>
         <h3>
-          <a href={item.url} target="_blank" rel="noreferrer">
+          <a href={item.originalUrl} target="_blank" rel="noreferrer">
             {item.title}
           </a>
         </h3>
@@ -38,6 +46,18 @@ export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: 
           <span className="ai-label">AI Summary:</span>
           {item.aiSummary}
         </p>
+        <p className="why-it-matters">
+          <span>Why it matters:</span>
+          {item.whyItMatters}
+        </p>
+        <footer className="card-intel">
+          <span className={`impact ${item.impactLevel}`}>{item.impactLevel} impact</span>
+          <span>Trend {item.trendScore}</span>
+          <span>{relatedSourcesCount} source{relatedSourcesCount === 1 ? "" : "s"}</span>
+        </footer>
+        <a className="read-source" href={item.originalUrl} target="_blank" rel="noreferrer">
+          Read Source
+        </a>
       </div>
     </article>
   );

@@ -8,7 +8,7 @@ export async function GET() {
 
   return NextResponse.json({
     updatedAt: result.fetchedAt,
-    count: result.articles.length,
-    news: result.articles
+    count: result.clusters.length,
+    clusters: result.clusters
   });
 }

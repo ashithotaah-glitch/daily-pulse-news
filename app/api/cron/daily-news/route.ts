@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getNews } from "@/lib/news";
+import { runNewsPipeline } from "@/lib/news";
 
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -9,12 +9,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const news = await getNews();
+  const result = await runNewsPipeline();
 
   return NextResponse.json({
     ok: true,
     refreshedAt: new Date().toISOString(),
-    capturedStories: news.length,
-    categories: [...new Set(news.map((item) => item.category))]
+    capturedStories: result.articles.length,
+    clusters: result.clusters.length,
+    categories: [...new Set(result.articles.map((item) => item.category))]
   });
 }
