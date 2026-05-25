@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { readAdminStore } from "@/lib/admin/store";
 import { siteConfig } from "@/lib/site";
@@ -77,6 +78,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         />
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

@@ -13,6 +13,7 @@ export function Header() {
           <Link href="/saved">Saved</Link>
           <Link href="/newsletter">Newsletter</Link>
           <Link href="/advertise">Advertise</Link>
+          <Link href="/contact">Contact</Link>
           <Link className="support-link" href="/#membership">
             Subscribe
           </Link>

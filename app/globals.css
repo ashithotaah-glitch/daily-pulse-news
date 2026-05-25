@@ -112,6 +112,44 @@ textarea {
   white-space: nowrap;
 }
 
+.site-footer {
+  background: var(--ink);
+  color: #fff;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  padding: 28px clamp(18px, 6vw, 76px);
+}
+
+.footer-brand span {
+  background: #fff;
+  color: var(--ink);
+}
+
+.site-footer p,
+.site-footer small {
+  color: #dce5df;
+  line-height: 1.45;
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  justify-content: flex-end;
+}
+
+.site-footer nav a {
+  color: #fff;
+  font-weight: 900;
+}
+
+.site-footer small {
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  grid-column: 1 / -1;
+  padding-top: 14px;
+}
+
 .top-ad-wrap,
 .publisher-hero,
 .reader-intel,
@@ -1953,6 +1991,33 @@ textarea {
   margin-top: 8px;
 }
 
+.policy-section {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  max-width: 900px;
+  padding: 20px;
+}
+
+.policy-section h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  margin: 10px 0 0;
+}
+
+.policy-section h2:first-child {
+  margin-top: 0;
+}
+
+.policy-section p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
 .push-box {
   display: grid;
   gap: 10px;
@@ -2219,6 +2284,7 @@ textarea {
   .layout-grid,
   .lead-layout,
   .lead-story,
+  .site-footer,
   .admin-grid,
   .inventory,
   .dashboard-insights,
@@ -2268,6 +2334,10 @@ textarea {
   .top-stories {
     border-left: 0;
     padding-left: 0;
+  }
+
+  .site-footer nav {
+    justify-content: flex-start;
   }
 
   .membership-band,
