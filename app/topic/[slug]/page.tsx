@@ -53,6 +53,17 @@ export default async function TopicPage({ params }: PageProps) {
   if (!articles.length && !topic) notFound();
 
   const clustersById = new Map(result.clusters.map((cluster) => [cluster.clusterId, cluster.sourcesCount]));
+  const timeline = [...articles].sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)).slice(0, 8);
+  const topSources = [...new Map(articles.map((article) => [article.sourceName, article])).values()].slice(0, 8);
+  const sentimentCounts = articles.reduce(
+    (counts, article) => {
+      counts[article.sentiment] += 1;
+      return counts;
+    },
+    { positive: 0, neutral: 0, negative: 0 }
+  );
+  const dominantSentiment = Object.entries(sentimentCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "neutral";
+  const briefingPoints = articles.flatMap((article) => article.keyPoints.slice(0, 1)).slice(0, 5);
   const schema = breadcrumbSchema([
     { name: "Home", url: siteConfig.url },
     { name: "Topics", url: `${siteConfig.url}/topic/${slug}` },
@@ -69,6 +80,64 @@ export default async function TopicPage({ params }: PageProps) {
           {topic ? `${topic.count} related stories across ${topic.categories.length} categories.` : "Related Flash Feed coverage from active sources."}
         </p>
       </header>
+      <section className="topic-intel-grid" aria-label={`${topicName} topic intelligence`}>
+        <article className="topic-briefing">
+          <span>AI briefing</span>
+          <strong>{articles[0]?.aiSummary || `Flash Feed is tracking ${topicName}.`}</strong>
+          <p>{articles[0]?.whyItMatters || "More source-linked updates will appear as the feed refreshes."}</p>
+        </article>
+        <article className="trend-card">
+          <span>Trend graph</span>
+          <div className="trend-bars" aria-hidden="true">
+            {timeline.slice(0, 7).map((article, index) => (
+              <i style={{ height: `${Math.max(18, Math.min(100, article.trendScore + index * 4))}%` }} key={article.id} />
+            ))}
+          </div>
+          <small>Placeholder trend graph using current trend scores.</small>
+        </article>
+        <article className="sentiment-card">
+          <span>Sentiment</span>
+          <strong>{dominantSentiment}</strong>
+          <small>
+            Positive {sentimentCounts.positive} / Neutral {sentimentCounts.neutral} / Negative {sentimentCounts.negative}
+          </small>
+        </article>
+        <article className="topic-sources-card">
+          <span>Top sources</span>
+          <div>
+            {topSources.map((article) => (
+              <a href={`/source/${sourceSlug(article.sourceName)}`} key={article.sourceName}>
+                <img src={article.sourceLogo} alt="" />
+                {article.sourceName}
+              </a>
+            ))}
+          </div>
+        </article>
+      </section>
+      <section className="topic-timeline">
+        <div className="section-heading">
+          <p className="eyebrow">Timeline</p>
+          <h2>Latest developments</h2>
+        </div>
+        <ol>
+          {timeline.map((article) => (
+            <li key={article.id}>
+              <time dateTime={article.publishedAt}>{new Date(article.publishedAt).toLocaleString()}</time>
+              <a href={article.originalUrl} target="_blank" rel="noreferrer">
+                {article.title}
+              </a>
+              <span>{article.sourceName}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+      {briefingPoints.length ? (
+        <section className="topic-key-points">
+          {briefingPoints.map((point) => (
+            <span key={point}>{point}</span>
+          ))}
+        </section>
+      ) : null}
       <section className="story-grid">
         {articles.map((article) => (
           <NewsCard item={article} key={article.id} relatedSourcesCount={clustersById.get(article.clusterId) || 1} />

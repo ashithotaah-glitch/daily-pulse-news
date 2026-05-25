@@ -13,6 +13,10 @@ export type {
 export { categories, sourceConfigs } from "./news/source-config";
 export { categoryImages } from "./news/images";
 export { runNewsPipeline, sortArticles } from "./news/processing";
+export { answerCopilotQuery } from "./news/copilot";
+export { buildLiveSnapshot, isBreakingStory } from "./news/realtime";
+export type { CopilotAnswer } from "./news/copilot";
+export type { LiveSnapshot, LiveTrend } from "./news/realtime";
 export {
   emptyReaderProfile,
   getPersonalizedBriefing,

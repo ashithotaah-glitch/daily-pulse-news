@@ -75,11 +75,36 @@ export function titleSignature(title: string) {
 }
 
 export function keywordSet(value: string) {
-  const stopwords = new Set(["the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "with", "as", "at", "by"]);
+  const stopwords = new Set([
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "to",
+    "of",
+    "in",
+    "on",
+    "for",
+    "with",
+    "as",
+    "at",
+    "by",
+    "what",
+    "why",
+    "how",
+    "when",
+    "today",
+    "this",
+    "week",
+    "summarize",
+    "happened"
+  ]);
+  const shortSignals = new Set(["ai", "us", "uk", "eu"]);
   return new Set(
     normalizedTitle(value)
       .split(/\s+/)
-      .filter((word) => word.length > 2 && !stopwords.has(word))
+      .filter((word) => (word.length > 2 || shortSignals.has(word)) && !stopwords.has(word))
   );
 }
 

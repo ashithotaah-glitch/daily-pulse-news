@@ -1,10 +1,12 @@
 import { AdSlot } from "@/components/AdSlot";
+import { AskFlashFeed } from "@/components/AskFlashFeed";
 import { CategoryTabs } from "@/components/CategoryTabs";
+import { LiveNewsStream } from "@/components/LiveNewsStream";
 import { NewsCard } from "@/components/NewsCard";
 import { ReaderPersonalization } from "@/components/ReaderPersonalization";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
 import { TrendingNow } from "@/components/TrendingNow";
-import { categories, getClusters, getFeatured, getNews } from "@/lib/news";
+import { buildLiveSnapshot, categories, getClusters, getFeatured, getNews, getTopics } from "@/lib/news";
 import { siteConfig } from "@/lib/site";
 import { Fragment } from "react";
 
@@ -13,6 +15,7 @@ export const revalidate = 600;
 export default async function Home() {
   const news = await getNews();
   const clusters = await getClusters();
+  const topics = await getTopics();
   const featured = getFeatured(news);
   if (!featured) {
     return (
@@ -30,6 +33,13 @@ export default async function Home() {
   const fastestGrowing = news.slice(7, 11);
   const trendingTopics = ["OpenAI", "India markets", "Apple AI", "Oil prices", "Cybersecurity", "Streaming"];
   const sourcesByCluster = new Map(clusters.map((cluster) => [cluster.clusterId, cluster.sourcesCount]));
+  const liveSnapshot = buildLiveSnapshot({
+    articles: news,
+    clusters,
+    topics,
+    sources: [],
+    fetchedAt: new Date().toISOString()
+  });
 
   return (
     <main>
@@ -70,6 +80,10 @@ export default async function Home() {
       </section>
 
       <CategoryTabs />
+
+      <LiveNewsStream initialStories={liveSnapshot.liveStories} initialTicker={liveSnapshot.ticker} />
+
+      <AskFlashFeed />
 
       <ReaderPersonalization initialArticles={news.slice(0, 12)} />
 
