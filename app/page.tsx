@@ -3,7 +3,7 @@ import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
 import { categories, getFeatured, getNews } from "@/lib/news";
-import { revenueSlots, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
 
 export const revalidate = 1800;
 
@@ -22,7 +22,6 @@ export default async function Home() {
           <p>{siteConfig.tagline}</p>
           <div className="hero-actions">
             <a href="#latest">Read latest</a>
-            <a href="/admin">Manage monetization</a>
           </div>
         </div>
       </section>
@@ -30,7 +29,7 @@ export default async function Home() {
       <CategoryTabs />
 
       <section className="market-strip" aria-label="Publisher metrics">
-        {["Hourly feed refresh", "10 core categories", "SEO-ready pages", "AdSense inventory"].map((metric) => (
+        {["Hourly feed refresh", "10 core categories", "Global coverage", "Fast briefings"].map((metric) => (
           <span key={metric}>{metric}</span>
         ))}
       </section>
@@ -47,7 +46,7 @@ export default async function Home() {
           <AdSlot label="Homepage leaderboard" size="970 x 250 responsive" tone="dark" />
           <div className="briefing-box">
             <span>Newsletter</span>
-            <strong>Morning Pulse</strong>
+            <strong>FlashFeed Morning</strong>
             <p>Package top stories, market context, and sponsored placements into a daily send.</p>
             <button>Enable signup</button>
           </div>
@@ -82,21 +81,6 @@ export default async function Home() {
         );
       })}
 
-      <section className="monetization-band" id="monetization">
-        <div>
-          <p className="eyebrow">Revenue Architecture</p>
-          <h2>Designed for AdSense, sponsorships, affiliates, newsletter growth, and premium editorial packages.</h2>
-        </div>
-        <div className="revenue-grid">
-          {revenueSlots.map((slot) => (
-            <article key={slot.name}>
-              <span>{slot.yield}</span>
-              <strong>{slot.name}</strong>
-              <p>{slot.placement}</p>
-            </article>
-          ))}
-        </div>
-      </section>
     </main>
   );
 }

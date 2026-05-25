@@ -1,11 +1,5 @@
 import type { NewsItem } from "@/lib/news";
 
-const fitLabels: Record<NewsItem["monetizationFit"], string> = {
-  affiliate: "Affiliate fit",
-  premium: "Premium fit",
-  "display-ads": "Display ad fit"
-};
-
 export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: boolean }) {
   return (
     <article className={feature ? "news-card feature" : "news-card"}>
@@ -29,7 +23,7 @@ export function NewsCard({ item, feature = false }: { item: NewsItem; feature?: 
         <p>{item.summary}</p>
         <footer>
           <span>{item.source}</span>
-          <small>{fitLabels[item.monetizationFit]}</small>
+          <small>Developing story</small>
         </footer>
       </div>
     </article>

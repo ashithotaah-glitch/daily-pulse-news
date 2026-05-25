@@ -233,7 +233,6 @@ textarea {
 }
 
 .section-heading h2,
-.monetization-band h2,
 .admin-hero h1 {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(32px, 5vw, 58px);
@@ -400,46 +399,6 @@ textarea {
   border-top: 1px solid var(--line);
 }
 
-.monetization-band {
-  background: var(--ink);
-  color: #fff;
-  display: grid;
-  gap: 28px;
-  grid-template-columns: 0.95fr 1.05fr;
-  max-width: none;
-  padding: 58px clamp(18px, 6vw, 76px);
-}
-
-.revenue-grid {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.revenue-grid article {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 18px;
-}
-
-.revenue-grid span {
-  color: #ffcf62;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.revenue-grid strong {
-  display: block;
-  font-size: 20px;
-  margin-top: 8px;
-}
-
-.revenue-grid p {
-  color: #dbe3df;
-}
-
 .admin-page {
   padding: 36px clamp(18px, 5vw, 64px) 64px;
 }
@@ -590,7 +549,6 @@ textarea {
 
 @media (max-width: 980px) {
   .layout-grid,
-  .monetization-band,
   .admin-grid,
   .inventory {
     grid-template-columns: 1fr;
@@ -635,7 +593,6 @@ textarea {
   .market-strip,
   .story-grid,
   .story-grid.compact,
-  .revenue-grid,
   .inventory-list {
     grid-template-columns: 1fr;
   }

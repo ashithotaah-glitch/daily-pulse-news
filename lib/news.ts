@@ -54,7 +54,7 @@ const fallbackNews: NewsItem[] = categories.flatMap((category, index) => [
     title: `${category.label} daily briefing: key moves editors are tracking`,
     summary:
       "A concise editor-ready briefing slot for the latest syndicated stories, market-moving updates, and reader-friendly explainers when live feeds are unavailable.",
-    source: "Daily Pulse Desk",
+    source: "FlashFeed Desk",
     url: "#",
     category: category.id,
     publishedAt: new Date(Date.now() - index * 3600000).toISOString(),

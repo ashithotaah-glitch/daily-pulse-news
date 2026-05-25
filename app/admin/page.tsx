@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AdminConsole } from "@/components/AdminConsole";
 
 export const metadata: Metadata = {
-  title: "Admin Console",
+  title: "FlashFeed Admin Console",
   description: "Manage SEO settings, AdSense placements, sponsorship inventory, and monetization tools."
 };
 
