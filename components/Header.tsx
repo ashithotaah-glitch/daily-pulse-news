@@ -4,14 +4,27 @@ import { siteConfig } from "@/lib/site";
 export function Header() {
   return (
     <header className="site-header">
-      <Link className="brand" href="/">
-        <span>FF</span>
-        <strong>{siteConfig.name}</strong>
-      </Link>
-      <nav aria-label="Primary navigation">
-        <Link href="/#top">News</Link>
-        <Link href="/#finance">Markets</Link>
+      <div className="header-topline">
+        <Link className="brand" href="/">
+          <span>FF</span>
+          <strong>{siteConfig.name}</strong>
+        </Link>
+        <div className="reader-actions">
+          <Link href="#newsletter">Newsletter</Link>
+          <Link className="support-link" href="#membership">
+            Subscribe
+          </Link>
+        </div>
+      </div>
+      <nav aria-label="Primary navigation" className="primary-nav">
+        <Link href="/#top">Home</Link>
         <Link href="/#world">World</Link>
+        <Link href="/#geopolitics">Geo-Politics</Link>
+        <Link href="/#finance">Finance</Link>
+        <Link href="/#technology">Tech</Link>
+        <Link href="/#entertainment">Culture</Link>
+        <Link href="/#sports">Sports</Link>
+        <Link href="/#health">Health</Link>
       </nav>
     </header>
   );
