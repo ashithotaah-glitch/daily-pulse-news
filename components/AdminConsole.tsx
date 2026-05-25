@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { revenueSlots, siteConfig } from "@/lib/site";
+import { siteConfig } from "@/lib/site";
+
+const revenueSlots = [
+  { name: "Top leaderboard", format: "970x250 / responsive", placement: "Homepage header", yield: "High" },
+  { name: "In-feed native", format: "Fluid", placement: "Between story cards", yield: "Medium" },
+  { name: "Article rail", format: "300x600", placement: "Desktop right rail", yield: "High" },
+  { name: "Sponsored briefing", format: "Newsletter + homepage", placement: "Morning package", yield: "Premium" }
+];
 
 type Settings = {
   siteTitle: string;

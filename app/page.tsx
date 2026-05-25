@@ -1,5 +1,3 @@
-import { Fragment } from "react";
-import { AdSlot } from "@/components/AdSlot";
 import { CategoryTabs } from "@/components/CategoryTabs";
 import { NewsCard } from "@/components/NewsCard";
 import { categories, getFeatured, getNews } from "@/lib/news";
@@ -29,7 +27,7 @@ export default async function Home() {
       <CategoryTabs />
 
       <section className="market-strip" aria-label="Publisher metrics">
-        {["Hourly feed refresh", "10 core categories", "Global coverage", "Fast briefings"].map((metric) => (
+        {["Live feed updates", "10 core categories", "Global coverage", "Fast briefings"].map((metric) => (
           <span key={metric}>{metric}</span>
         ))}
       </section>
@@ -43,22 +41,18 @@ export default async function Home() {
           <NewsCard item={featured} feature />
         </div>
         <aside className="right-rail">
-          <AdSlot label="Homepage leaderboard" size="970 x 250 responsive" tone="dark" />
           <div className="briefing-box">
-            <span>Newsletter</span>
-            <strong>FlashFeed Morning</strong>
-            <p>Package top stories, market context, and sponsored placements into a daily send.</p>
-            <button>Enable signup</button>
+            <span>Today</span>
+            <strong>What readers are following</strong>
+            <p>Fresh headlines across world affairs, markets, technology, culture, science, health, and sports.</p>
+            <a href="#world">Explore world news</a>
           </div>
         </aside>
       </section>
 
       <section className="story-grid">
-        {latest.map((item, index) => (
-          <Fragment key={item.id}>
-            <NewsCard item={item} key={item.id} />
-            {index === 2 ? <AdSlot key="native-ad" label="In-feed native ad" size="Fluid responsive" /> : null}
-          </Fragment>
+        {latest.map((item) => (
+          <NewsCard item={item} key={item.id} />
         ))}
       </section>
 
@@ -80,7 +74,6 @@ export default async function Home() {
           </section>
         );
       })}
-
     </main>
   );
 }

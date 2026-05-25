@@ -19,7 +19,6 @@ export type NewsItem = {
   category: NewsCategory;
   publishedAt: string;
   image: string;
-  monetizationFit: "premium" | "affiliate" | "display-ads";
 };
 
 export const categories: { id: NewsCategory; label: string; query: string }[] = [
@@ -54,12 +53,11 @@ const fallbackNews: NewsItem[] = categories.flatMap((category, index) => [
     title: `${category.label} daily briefing: key moves editors are tracking`,
     summary:
       "A concise editor-ready briefing slot for the latest syndicated stories, market-moving updates, and reader-friendly explainers when live feeds are unavailable.",
-    source: "FlashFeed Desk",
+    source: "Flash Feed Desk",
     url: "#",
     category: category.id,
     publishedAt: new Date(Date.now() - index * 3600000).toISOString(),
-    image: categoryImages[category.id],
-    monetizationFit: index % 3 === 0 ? "premium" : index % 3 === 1 ? "affiliate" : "display-ads"
+    image: categoryImages[category.id]
   }
 ]);
 
@@ -90,12 +88,6 @@ function sourceFromUrl(url: string) {
   }
 }
 
-function monetizationFor(category: NewsCategory): NewsItem["monetizationFit"] {
-  if (category === "finance" || category === "technology" || category === "business") return "affiliate";
-  if (category === "geopolitics" || category === "world") return "premium";
-  return "display-ads";
-}
-
 async function fetchCategoryFeed(category: (typeof categories)[number]): Promise<NewsItem[]> {
   const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(category.query)}&hl=en-US&gl=US&ceid=US:en`;
   const response = await fetch(feedUrl, { next: { revalidate: 3600 } });
@@ -121,8 +113,7 @@ async function fetchCategoryFeed(category: (typeof categories)[number]): Promise
       url: rawUrl,
       category: category.id,
       publishedAt,
-      image: categoryImages[category.id],
-      monetizationFit: monetizationFor(category.id)
+      image: categoryImages[category.id]
     };
   });
 }
