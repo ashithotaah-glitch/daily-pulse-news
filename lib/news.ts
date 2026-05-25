@@ -63,6 +63,74 @@ const categoryImages: Record<NewsCategory, string> = {
   world: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80"
 };
 
+const categoryImagePools: Record<NewsCategory, string[]> = {
+  top: [
+    categoryImages.top,
+    "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80"
+  ],
+  technology: [
+    categoryImages.technology,
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1200&q=80"
+  ],
+  business: [
+    categoryImages.business,
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1200&q=80"
+  ],
+  finance: [
+    categoryImages.finance,
+    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1559526324-593bc073d938?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1200&q=80"
+  ],
+  geopolitics: [
+    categoryImages.geopolitics,
+    "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1575320181282-9afab399332c?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=1200&q=80"
+  ],
+  entertainment: [
+    categoryImages.entertainment,
+    "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1200&q=80"
+  ],
+  sports: [
+    categoryImages.sports,
+    "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=1200&q=80"
+  ],
+  science: [
+    categoryImages.science,
+    "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1518152006812-edab29b069ac?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1581093458791-9d15482442f6?auto=format&fit=crop&w=1200&q=80"
+  ],
+  health: [
+    categoryImages.health,
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&w=1200&q=80"
+  ],
+  world: [
+    categoryImages.world,
+    "https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80"
+  ]
+};
+
 const feedSources: FeedSource[] = [
   {
     name: "Reuters",
@@ -265,11 +333,31 @@ function buildAiSummary(title: string, summary: string, source: string) {
   return trimmed;
 }
 
-function itemImage(block: string, source: FeedSource) {
+function stableIndex(value: string, modulo: number) {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash % modulo;
+}
+
+function extractDescriptionImage(block: string) {
+  const description = tagValue(block, "description") || tagValue(block, "content:encoded");
+  const imgSrc = description.match(/<img[^>]+src=["']([^"']+)["']/i)?.[1];
+  return imgSrc ? decodeHtml(imgSrc) : "";
+}
+
+function variedFallbackImage(source: FeedSource, title: string, index: number) {
+  const pool = categoryImagePools[source.category];
+  return pool[stableIndex(`${source.name}-${title}-${index}`, pool.length)];
+}
+
+function itemImage(block: string, source: FeedSource, title: string, index: number) {
   const mediaContent = attrValue(block, "media:content", "url");
   const mediaThumbnail = attrValue(block, "media:thumbnail", "url");
   const enclosure = attrValue(block, "enclosure", "url");
-  return mediaContent || mediaThumbnail || enclosure || source.image || categoryImages[source.category];
+  const descriptionImage = extractDescriptionImage(block);
+  return mediaContent || mediaThumbnail || enclosure || descriptionImage || source.image || variedFallbackImage(source, title, index);
 }
 
 async function fetchSourceFeed(source: FeedSource): Promise<NewsItem[]> {
@@ -312,7 +400,7 @@ async function fetchSourceFeed(source: FeedSource): Promise<NewsItem[]> {
       url: rawUrl,
       category: source.category,
       publishedAt,
-      image: itemImage(block, source),
+      image: itemImage(block, source, title, index),
       sourceIcon: faviconForUrl(source.homepage)
     };
   });
